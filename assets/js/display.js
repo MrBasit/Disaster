@@ -44,9 +44,10 @@ function displayThankYou(selector, message) {
 function renderAvailableAid(aid, selector) {}
 
 function displayFeedbackDisasterSaved() {}
+
 // Add additional functions below
 // select disaster type
-// document.querySelector(".lone").addEventListener("click", renderDisasters());
+document.querySelector(".lone").addEventListener("click", renderDisasters);
 
 // create UI
 function disasterUI(disaster, disasterType, imageArray, dataArray, index) {

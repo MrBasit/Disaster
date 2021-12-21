@@ -122,8 +122,10 @@ const btnPrevious = document.querySelector(".previous");
 btnPrevious.addEventListener("click", function (e) {
   document.querySelector("#disaster-type").classList.add("hidden");
   document.querySelector("#disaster-location").classList.remove("hidden");
+  document.querySelector('.disasters').innerHTML = " ";
   e.preventDefault();
 });
+
 // ----show aids----//
 document.querySelector("#show-aid").addEventListener("click", showAid);
 
@@ -134,8 +136,5 @@ btnChangeDisaster.addEventListener("click", function (e) {
   document.querySelector("#disaster-aid").classList.add("hidden");
   document.querySelector("#disaster-type").classList.remove("hidden");
   document.querySelector("#disaster-aid .aids").innerHTML = "";
-  // submittedDisasters.forEach((element) => {
-  //   console.log(element);
-  // });
   e.preventDefault();
 });
