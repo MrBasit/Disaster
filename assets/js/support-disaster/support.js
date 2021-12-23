@@ -1,30 +1,36 @@
 "use strict";
-
+let elementRef
 function selectSupportableDisaster(e) {
   let getIndex = 0;
   const supportForm = document.querySelectorAll(
     "#submitted-disasters .flexcontainer article"
   );
-
-  //   get span
-  // const span = document.querySelectorAll("span");
+  
   supportForm.forEach((element) => {
     let fire = false;
     element.addEventListener("click", function (e) {
-      if (!fire) {
+      // console.log(element.lastElementChild === 'flexcontainer');
+      if (element.lastElementChild.className !== 'flexcontainer') {
+        element.classList.add('selected-article');
         selectedElement = element;
+        elementRef = element.querySelector('.aid-progress');
         supportForm.forEach((element) => {
+          // hidden thankyou class
+          if(element.lastElementChild.className  === 'thankyou'){
+            element.lastElementChild.classList.add('hidden')
+          }
+
+          // hidden existing support form
           if (element.lastElementChild.className === "flexcontainer") {
             element.lastElementChild.style.display = "none";
+            element.removeChild(element.lastElementChild)
           }
         });
         element.append(createSupportUI());
         supportDisaster();
         fire = true;
-        console.log("fired");
-      } else {
-        console.log("not fired");
       }
+      
       e.preventDefault();
     });
   });
@@ -35,17 +41,24 @@ function supportDisaster(e) {
   const aidSupport = document.querySelector(".aidsupport");
   aidSupport.addEventListener("click", function (e) {
     // set aid value
-    selectedElement.lastElementChild.previousSibling.firstElementChild.lastElementChild.firstElementChild.lastElementChild.innerText =
-      aidValue(disaster);
+    const aidProgress = selectedElement.querySelector('.aid-progress');
+    
+    const currencyProgress = selectedElement.querySelector('.currency-progress')
+
+    const disasterType = selectedElement.querySelector('h3').innerText;
+    const location =  selectedElement.querySelector('dl').lastElementChild.innerText;
+    const array = getFromLocalStorage();
+    array.forEach(element => {
+      if(element.location.toLowerCase() === location.toLowerCase() && element.name === disasterType)
+      {
+        aidProgress.innerText = aidGoal(element);
+      }
+    });
+
+    updateLocalStorage(location,disasterType,aidProgress.innerText,currencyProgress.innerText)
 
     // display thank you meassage
     thankyou("Thank you for your support < 3");
-
-    // validation for reached goals
-    // if (aidValue(selectedElement) >= reachAidGoal()) {
-    //   selectedElement.append(reachedGoal());
-    // }
-
     // hide form
     e.target.parentNode.style.display = "none";
     e.preventDefault();
@@ -54,16 +67,29 @@ function supportDisaster(e) {
   // support money
   const moneySupport = document.querySelector(".moneysupport");
   moneySupport.addEventListener("click", function (e) {
-    // set currency
-    selectedElement.lastElementChild.lastElementChild.lastElementChild.firstElementChild.lastElementChild.innerText =
-      moneyValue(selectedElement);
+    // selectors
+    const currencyProgress = selectedElement.querySelector('.currency-progress');
+    const currencyGoal = selectedElement.querySelector('.currency-goal');
+    const aidProgress = selectedElement.querySelector('.aid-progress');
+    const disasterType = selectedElement.querySelector('h3').innerText;
+    const location =  selectedElement.querySelector('dl').lastElementChild.innerText;
+    const array = getFromLocalStorage();
+    array.forEach(element => {
+      if(element.location.toLowerCase() === location.toLowerCase() && element.name === disasterType){
+        
+        currencyProgress.innerText = moneyGoal(element);
+        if(element.currencyGoal <= moneyGoal()){
+          selectedElement.classList.add('success')
+          selectedElement.append(reachedGoal(disaster.requestedAid))
+        }
+      }
+    });
+    
+     updateLocalStorage(location, disasterType, aidProgress.innerText, currencyProgress.innerText)
+
 
     // display thank you message
     thankyou("Thank you for your support < 3");
-
-    // validate if reached goal
-    // if (moneyValue(selectedElement) >= reachMoneyGoal())
-    //   selectedElement.append(reachedGoal());
 
     // hidden form
     e.target.parentNode.style.display = "none";
@@ -74,26 +100,17 @@ function supportDisaster(e) {
 // Add additional functions below
 
 // get value form aid packages
-function aidValue(disaster) {
-  let getValue;
-  const targetAid = document.querySelector("select");
-  targetAid.addEventListener("click", function (e) {
-    console.log(e.target.value);
-    getValue = e.target.value;
-    e.preventDefault();
-  });
-  return disaster.aidProgress + parseInt(getValue);
+function aidGoal(disaster) {
+  return (parseInt(disaster.aidProgress) + parseInt(document.querySelector("select").value));
+ 
 }
 
 //get value from money package
-function moneyValue(element) {
-  let getCurrency;
+function moneyGoal(element) {
   const getInput = document.querySelector(".money");
-  getCurrency =
-    element.lastElementChild.lastElementChild.lastElementChild.firstElementChild
-      .lastElementChild.innerText;
-  if (getInput.value !== "")
-    return parseInt(getCurrency) + parseInt(getInput.value);
+  let value=getInput.value!==''?getInput.value:0;
+  if (getInput.value !== null)
+    return parseInt(selectedElement.querySelector('.currency-progress').innerText) + parseInt(value);
   else return getCurrency;
 }
 
@@ -105,33 +122,19 @@ function thankyou(message) {
   selectedElement.append(div);
 }
 
-// reach aid & money goal
-function reachAidGoal() {
-  return parseInt(
-    selectedElement.lastElementChild.firstElementChild.lastElementChild
-      .lastElementChild.firstElementChild.innerText
-  );
-}
-
-function reachMoneyGoal() {
-  return parseInt(
-    selectedElement.lastElementChild.lastElementChild.lastElementChild
-      .lastElementChild.lastElementChild.innerText
-  );
-}
 
 // reached goal
-function reachedGoal() {
+function reachedGoal(message) {
   const para = document.createElement("p");
   para.classList.add("success");
-  para.innerText = "goal reached";
+  para.innerText = message;
   return para;
 }
 
 // create form UI
 function createSupportUI() {
-  const packages = ["", "Food", "Medicine", "Diplomats"];
-  const values = [0, 10, 50, 100];
+  const packages = ["Food", "Medicine", "Diplomats"];
+  const values = [10, 50, 100];
   let index = 0;
 
   // form
@@ -179,12 +182,16 @@ function createSupportUI() {
   form.append(dt, select, btn1, dt1, input, btn2);
   return form;
 }
-
-const parent = document.querySelector(".flexcontainer");
+let index = 0;
 function createDisastersUI(disaster) {
+  const parent = document.querySelector(".flexcontainer");
   const dlArray = ["Category:", "Level:", "Location:"];
   const aidLabel = ["Aid:", "Currency:"];
   const aidStatus = ["progress:", "goal:"];
+  const classes = ['aid-progress', 'aid-goal', 'currency-progress', 'currency-goal']
+  getImages();
+
+  
 
   //target parent element & article
   const article = document.createElement("article");
@@ -194,11 +201,15 @@ function createDisastersUI(disaster) {
   h3.innerText = disaster.name;
 
   // img element
+  const figure = document.createElement('figure')
   const img = document.createElement("img");
-  img.setAttribute("title", "para.name");
-  img.setAttribute("alt", "para.name");
-  img.setAttribute("src", "./images/flood.svg");
+  let image= getImages()[index].toLocaleLowerCase();
+  image = image.split(' ');
+  image=image.join('-');
+  const path = `./images/${image}.svg`;
+  img.setAttribute("src", path);
 
+  figure.append(img)
   // data labels
   const dl = document.createElement("dl");
   for (let index = 0; index < 3; index++) {
@@ -232,18 +243,28 @@ function createDisastersUI(disaster) {
       const nestedli = document.createElement("li");
       nestedli.innerText = aidStatus[index];
       const span = document.createElement("span");
-      if (index < 1) {
+      if(classes)
+
+      // first iteration
+      if (index == 0 && increament < 1) {
+        span.classList.add(classes[index])
         span.innerText = disaster.aidProgress;
-      } else {
+      } 
+      if(index == 1 && increament < 1){
+        span.classList.add(classes[index])
         span.innerText = disaster.aidGoal;
       }
+      
+      // second iteration
+      if(index == 0 && increament > 0){
+        span.classList.add(classes[index + 2])
 
-      if (increament > 0) {
         span.innerText = disaster.currencyProgress;
       }
-      // else {
-      //   span.innerText = disaster.currencyGoal;
-      // }
+      if(index == 1 && increament > 0){
+        span.classList.add(classes[index + 2])
+        span.innerText = disaster.currencyGoal;
+      }
 
       // append child
       nestedli.append(span);
@@ -255,21 +276,57 @@ function createDisastersUI(disaster) {
     ul.append(li);
   }
   // append childs
-  article.append(h3, img, dl, ul);
+  article.append(h3,figure, dl, ul);
   parent.append(article);
+  index++;
+
+  if(disaster.currencyProgress >= disaster.currencyGoal){
+     article.classList.add('success');
+     article.append(reachedGoal(disaster.requestedAid))
+    }
+
+    if(disaster.aidProgress >= disaster.aidGoal){
+      article.classList.add('success');
+      reachedGoal(disaster.requestedAid)
+  }
 }
+
+// update local storage
+function updateLocalStorage(location , disasterType, aidProgress, currencyProgress){
+  const saveLocalStorage = getFromLocalStorage();
+  saveLocalStorage.forEach(element => {
+    if((element.location).toLowerCase() === location && element.name === disasterType){
+       element.aidProgress = aidProgress;
+       element.currencyProgress = currencyProgress;
+       localStorage.setItem('submittedDisasters', JSON.stringify(saveLocalStorage))
+    }
+  });
+}
+
+// get images 
+function getImages(){
+  const imagesArray = []
+  const images = getFromLocalStorage();
+  images.forEach(element => {
+    imagesArray.push(element.name)
+  });
+  return imagesArray;
+}
+
 
 // show disasters
 let selectedElement; // reference targeted element
 let disaster;
-
 function showDisaster() {
   getFromLocalStorage().forEach((element) => {
     disaster = element;
     createDisastersUI(element);
   });
   selectSupportableDisaster();
+  // getImages();
 }
 
 // call display disasters
 showDisaster();
+
+

@@ -43,6 +43,7 @@ function selectDisaster(e) {
   e.preventDefault();
 }
 
+// get length
 function showAid(e) {
   let count = 0;
   const arrayofImages = [
@@ -98,7 +99,7 @@ function selectAid(e) {
 
 // Add additional functions below
 
-let getCategory, getHeading, getCountry, getLevel, requestedAid, getLength;
+let getCategory, getHeading, getCountry, getLevel, requestedAid, getLength, getDisasterLength;
 
 // general function
 function validate() {

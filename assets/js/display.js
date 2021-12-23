@@ -26,6 +26,7 @@ function renderDisasters(e) {
     index++;
   });
   selectDisaster(e);
+  getDisasterLength = document.querySelectorAll('.disasters article').length;
   e.preventDefault();
 }
 
