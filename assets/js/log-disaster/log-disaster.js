@@ -1,8 +1,15 @@
 "use strict";
 
-function suggestCountry(e, search = "") {
-  // get unorderlist
-  let changeCase = search.toUpperCase();
+function suggestCountry(e) {
+
+  // search location
+const searchedCountries = document.querySelector("#disaster-location ul");
+document.querySelector("#location").addEventListener("keyup", function (e) {
+
+  // remove list
+  searchedCountries.innerHTML = "";
+  let country = e.target.value;
+  let changeCase = country.toUpperCase();
   for (const country of countries) {
     if (country.toUpperCase().startsWith(changeCase)) {
       let list = document.createElement("li");
@@ -10,6 +17,10 @@ function suggestCountry(e, search = "") {
       searchedCountries.appendChild(list);
     }
   }
+
+  selectCountry(e);
+  e.preventDefault();
+});
 }
 
 function selectCountry(e) {
@@ -24,7 +35,34 @@ function selectCountry(e) {
   });
 }
 
-function navigate(e) {}
+function navigate(e) {
+  // target select disaster Type
+  document.querySelector(".lone").addEventListener("click", renderDisasters);
+
+  // target show aid
+  document.querySelector("#show-aid").addEventListener("click", showAid);
+
+  // goto search location
+const btnPrevious = document.querySelector(".previous");
+btnPrevious.addEventListener("click", function (e) {
+  document.querySelector("#disaster-type").classList.add("hidden");
+  document.querySelector("#disaster-location").classList.remove("hidden");
+  document.querySelector('.disasters').innerHTML = " ";
+  e.preventDefault();
+});
+
+// change disaster type
+const btnChangeDisaster =
+  document.querySelector("#disaster-aid .flexcontainer .previous");
+btnChangeDisaster.addEventListener("click", function (e) {
+  document.querySelector("#disaster-aid").classList.add("hidden");
+  document.querySelector("#disaster-type").classList.remove("hidden");
+  document.querySelector("#disaster-aid .aids").innerHTML = "";
+  e.preventDefault();
+});
+
+
+}
 
 function selectDisaster(e) {
   let getIndex = 0;
@@ -43,16 +81,8 @@ function selectDisaster(e) {
   e.preventDefault();
 }
 
-// get length
 function showAid(e) {
   let count = 0;
-  const arrayofImages = [
-    "images/flood-sandbags.svg",
-    "images/ask-bono-to-sing.svg",
-    "images/media-coverage.svg",
-    "images/helping-hands.svg",
-    "images/collective-prayer.svg",
-  ];
   document.querySelector("#disaster-type").classList.add("hidden");
   const getAid = document.querySelector(".aids");
   if (validate()) {
@@ -66,7 +96,10 @@ function showAid(e) {
           h3.innerText = array.name;
 
           const img = document.createElement("img");
-          img.setAttribute("src", arrayofImages[count]);
+          let image = array.name.toLocaleLowerCase().split(' ');
+          image = image.join('-');
+          image = `./images/${image}.svg`
+          img.setAttribute("src", image);
           const label = document.createElement("label");
           label.innerText = "applies to:";
           const para = document.createElement("p");
@@ -87,55 +120,35 @@ function selectAid(e) {
   let getIndex = 0;
   const aids = document.querySelectorAll(".aids article");
 
-  aids.forEach((aid) => {
-    aid.addEventListener("click", function (e) {
+  aids.forEach((element) => {
+    element.addEventListener("click", function (e) {
       aids[getIndex].classList.remove("selected");
-      getIndex = Array.from(aids).indexOf(aid);
-      aid.classList.add("selected");
-      requestedAid = aid.firstChild.innerText;
+      getIndex = Array.from(aids).indexOf(element);
+      element.classList.add("selected");
+      requestedAid = element.firstChild.innerText;
+      aid.forEach(element => {
+        if(requestedAid === element.name){
+          feedback = element.confirmationMessage;
+        }
+      });
     });
   });
 }
 
 // Add additional functions below
-
-let getCategory, getHeading, getCountry, getLevel, requestedAid, getLength, getDisasterLength;
+let feedback, getCategory, getHeading, getCountry, getLevel, requestedAid, getLength, getDisasterLength;
 
 // general function
 function validate() {
   let result = true;
-  if (getHeading === "Minor hostage situation") result = false;
+  if (getHeading === "Minor hostage situation"){
+    displayThankYou('thankyou', ' The ‘minor hostage situation’ does not have any aid available')
+    result = false;
+  } 
+    
   return result;
 }
-// search location
-const searchedCountries = document.querySelector("#disaster-location ul");
-document.querySelector("#location").addEventListener("keyup", function (e) {
-  // remove list
-  searchedCountries.innerHTML = "";
-  let country = e.target.value;
-  suggestCountry(e, country);
-  selectCountry(e);
-  e.preventDefault();
-});
 
-// goto search location
-const btnPrevious = document.querySelector(".previous");
-btnPrevious.addEventListener("click", function (e) {
-  document.querySelector("#disaster-type").classList.add("hidden");
-  document.querySelector("#disaster-location").classList.remove("hidden");
-  document.querySelector('.disasters').innerHTML = " ";
-  e.preventDefault();
-});
-
-// ----show aids----//
-document.querySelector("#show-aid").addEventListener("click", showAid);
-
-// goto change disaster
-const btnChangeDisaster =
-  document.querySelector("#disaster-aid").lastElementChild.firstElementChild;
-btnChangeDisaster.addEventListener("click", function (e) {
-  document.querySelector("#disaster-aid").classList.add("hidden");
-  document.querySelector("#disaster-type").classList.remove("hidden");
-  document.querySelector("#disaster-aid .aids").innerHTML = "";
-  e.preventDefault();
-});
+// calling functions
+suggestCountry();
+navigate();

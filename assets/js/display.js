@@ -5,16 +5,7 @@ function renderDisasters(e) {
   const location = document.querySelector("#location");
   getCountry = location.value;
   location.value = "";
-  const getImages = [
-    "images/flood.svg",
-    "images/pandemic.svg",
-    "images/chemical-spill.svg",
-    "images/refugee-influx.svg",
-    "images/pandemic.svg",
-    "images/flood.svg",
-    "images/hail-storm.svg",
-    "images/tornado.svg",
-  ];
+ 
   const dataArray = ["Category:", "Level:"];
   // show & hide form
   document.querySelector("#disaster-location").classList.add("hidden");
@@ -22,7 +13,7 @@ function renderDisasters(e) {
   const disasters = document.querySelector(".disasters");
 
   disasterTypes.forEach(() => {
-    disasterUI(disasters, disasterTypes, getImages, dataArray, index);
+    disasterUI(disasters,disasterTypes,dataArray, index);
     index++;
   });
   selectDisaster(e);
@@ -47,11 +38,9 @@ function renderAvailableAid(aid, selector) {}
 function displayFeedbackDisasterSaved() {}
 
 // Add additional functions below
-// select disaster type
-document.querySelector(".lone").addEventListener("click", renderDisasters);
 
 // create UI
-function disasterUI(disaster, disasterType, imageArray, dataArray, index) {
+function disasterUI(disaster, disasterType, dataArray, index) {
   const parentElement = document.createElement("article");
   const h3 = document.createElement("h3");
   h3.innerText = disasterType[index].name;
@@ -59,7 +48,11 @@ function disasterUI(disaster, disasterType, imageArray, dataArray, index) {
   // create image element here
   const figure = document.createElement("figure");
   const img = document.createElement("img");
-  img.setAttribute("src", imageArray[index]);
+  let image = h3.innerText.toLocaleLowerCase();
+  image = image.split(' ')
+  image = image.join('-')
+  const path = `./images/${image}.svg`
+  img.setAttribute("src", path);
   figure.append(img);
 
   // create dl

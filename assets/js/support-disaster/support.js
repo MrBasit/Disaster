@@ -5,35 +5,27 @@ function selectSupportableDisaster(e) {
   const supportForm = document.querySelectorAll(
     "#submitted-disasters .flexcontainer article"
   );
-  
-  supportForm.forEach((element) => {
-    let fire = false;
-    element.addEventListener("click", function (e) {
-      // console.log(element.lastElementChild === 'flexcontainer');
-      if (element.lastElementChild.className !== 'flexcontainer') {
-        element.classList.add('selected-article');
-        selectedElement = element;
-        elementRef = element.querySelector('.aid-progress');
-        supportForm.forEach((element) => {
-          // hidden thankyou class
-          if(element.lastElementChild.className  === 'thankyou'){
-            element.lastElementChild.classList.add('hidden')
-          }
 
-          // hidden existing support form
-          if (element.lastElementChild.className === "flexcontainer") {
-            element.lastElementChild.style.display = "none";
-            element.removeChild(element.lastElementChild)
+    supportForm.forEach(form => {
+      form.addEventListener('click', function(e){
+         selectedElement = form;
+         elementRef = form.querySelector('.aid-progress');
+         if(form.lastElementChild.className !== 'flexcontainer'){
+          //  remove last child
+           supportForm.forEach(element => {
+             if(element.lastElementChild.className === 'flexcontainer'){
+               element.removeChild(element.lastElementChild)
+             }
+           });
+          //  create form ui
+           form.append(createSupportUI());
+            supportDisaster();
+           
           }
-        });
-        element.append(createSupportUI());
-        supportDisaster();
-        fire = true;
-      }
+        e.preventDefault();
+      })
       
-      e.preventDefault();
     });
-  });
 }
 
 function supportDisaster(e) {
@@ -42,9 +34,7 @@ function supportDisaster(e) {
   aidSupport.addEventListener("click", function (e) {
     // set aid value
     const aidProgress = selectedElement.querySelector('.aid-progress');
-    
-    const currencyProgress = selectedElement.querySelector('.currency-progress')
-
+    const currencyProgress = selectedElement.querySelector('.currency-progress');
     const disasterType = selectedElement.querySelector('h3').innerText;
     const location =  selectedElement.querySelector('dl').lastElementChild.innerText;
     const array = getFromLocalStorage();
@@ -58,9 +48,10 @@ function supportDisaster(e) {
     updateLocalStorage(location,disasterType,aidProgress.innerText,currencyProgress.innerText)
 
     // display thank you meassage
+    selectedElement.removeChild(selectedElement.lastElementChild)
     thankyou("Thank you for your support < 3");
     // hide form
-    e.target.parentNode.style.display = "none";
+    e.stopPropagation();
     e.preventDefault();
   });
 
@@ -78,9 +69,16 @@ function supportDisaster(e) {
       if(element.location.toLowerCase() === location.toLowerCase() && element.name === disasterType){
         
         currencyProgress.innerText = moneyGoal(element);
+        
+        
         if(element.currencyGoal <= moneyGoal()){
           selectedElement.classList.add('success')
-          selectedElement.append(reachedGoal(disaster.requestedAid))
+          aid.forEach(element => {
+            if(disaster.requestedAid === element.name){
+              selectedElement.append(reachedGoal(element.confirmationMessage))
+
+            }
+          });
         }
       }
     });
@@ -89,10 +87,11 @@ function supportDisaster(e) {
 
 
     // display thank you message
-    thankyou("Thank you for your support < 3");
-
+    
     // hidden form
-    e.target.parentNode.style.display = "none";
+    selectedElement.removeChild(selectedElement.lastElementChild);
+    thankyou("Thank you for your support < 3");
+    e.stopPropagation();
     e.preventDefault();
   });
 }
@@ -182,6 +181,7 @@ function createSupportUI() {
   form.append(dt, select, btn1, dt1, input, btn2);
   return form;
 }
+
 let index = 0;
 function createDisastersUI(disaster) {
   const parent = document.querySelector(".flexcontainer");
@@ -282,12 +282,12 @@ function createDisastersUI(disaster) {
 
   if(disaster.currencyProgress >= disaster.currencyGoal){
      article.classList.add('success');
-     article.append(reachedGoal(disaster.requestedAid))
+     article.append(reachedGoal(disaster.message))
     }
 
     if(disaster.aidProgress >= disaster.aidGoal){
       article.classList.add('success');
-      reachedGoal(disaster.requestedAid)
+      reachedGoal(disaster.message)
   }
 }
 
@@ -323,6 +323,7 @@ function showDisaster() {
     createDisastersUI(element);
   });
   selectSupportableDisaster();
+  // supportDisaster();
   // getImages();
 }
 

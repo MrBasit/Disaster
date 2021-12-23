@@ -1,6 +1,13 @@
 "use strict";
 
-function submitDisaster(e) {}
+function submitDisaster(e) {
+  // target save disasters
+document
+.querySelector("#disaster-aid").lastElementChild.lastElementChild.addEventListener("click", function (e) {
+  saveDisaster(addDisaster());
+  e.preventDefault();
+});
+}
 
 function saveDisaster(disaster) {
 
@@ -32,6 +39,7 @@ function addDisaster() {
     aidGoal: determineAid(getLength, getDisasterLength),
     currencyGoal: determineCurrency(getLevel),
     requestedAid: requestedAid,
+    message: feedback
 
   };
 }
@@ -57,9 +65,8 @@ function checkDuplicate(name, country) {
   });
   return validate;
 }
-// target save disasters
-document
-  .querySelector("#disaster-aid").lastElementChild.lastElementChild.addEventListener("click", function (e) {
-    saveDisaster(addDisaster());
-    e.preventDefault();
-  });
+
+
+// call functions
+submitDisaster();
+
