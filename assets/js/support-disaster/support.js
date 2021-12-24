@@ -42,13 +42,13 @@ function supportDisaster(e) {
       if(element.location.toLowerCase() === location.toLowerCase() && element.name === disasterType)
       {
         aidProgress.innerText = aidGoal(element);
+        selectedElement.removeChild(selectedElement.lastElementChild)
       }
     });
 
     updateLocalStorage(location,disasterType,aidProgress.innerText,currencyProgress.innerText)
 
     // display thank you meassage
-    selectedElement.removeChild(selectedElement.lastElementChild)
     thankyou("Thank you for your support < 3");
     // hide form
     e.stopPropagation();
@@ -67,16 +67,13 @@ function supportDisaster(e) {
     const array = getFromLocalStorage();
     array.forEach(element => {
       if(element.location.toLowerCase() === location.toLowerCase() && element.name === disasterType){
-        
         currencyProgress.innerText = moneyGoal(element);
-        
-        
         if(element.currencyGoal <= moneyGoal()){
           selectedElement.classList.add('success')
-          aid.forEach(element => {
-            if(disaster.requestedAid === element.name){
-              selectedElement.append(reachedGoal(element.confirmationMessage))
-
+          selectedElement.removeChild(selectedElement.lastElementChild)
+          aid.forEach(ad => {
+            if(ad.name === element.requestedAid){
+              selectedElement.append(reachedGoal(element.requestedAid))
             }
           });
         }
@@ -126,7 +123,7 @@ function thankyou(message) {
 function reachedGoal(message) {
   const para = document.createElement("p");
   para.classList.add("success");
-  para.innerText = message;
+  para.innerHTML = message;
   return para;
 }
 
@@ -316,18 +313,12 @@ function getImages(){
 
 // show disasters
 let selectedElement; // reference targeted element
-let disaster;
 function showDisaster() {
   getFromLocalStorage().forEach((element) => {
-    disaster = element;
     createDisastersUI(element);
   });
   selectSupportableDisaster();
-  // supportDisaster();
-  // getImages();
 }
 
 // call display disasters
 showDisaster();
-
-

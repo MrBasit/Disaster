@@ -85,7 +85,7 @@ function showAid(e) {
   let count = 0;
   document.querySelector("#disaster-type").classList.add("hidden");
   const getAid = document.querySelector(".aids");
-  if (validate()) {
+  if (renderBasicInfo(getHeading)) {
     document.querySelector("#disaster-aid").classList.remove("hidden");
     aid.forEach((array) => {
       array.disasterTypes.forEach((element) => {
@@ -100,6 +100,7 @@ function showAid(e) {
           image = image.join('-');
           image = `./images/${image}.svg`
           img.setAttribute("src", image);
+
           const label = document.createElement("label");
           label.innerText = "applies to:";
           const para = document.createElement("p");
@@ -126,28 +127,14 @@ function selectAid(e) {
       getIndex = Array.from(aids).indexOf(element);
       element.classList.add("selected");
       requestedAid = element.firstChild.innerText;
-      aid.forEach(element => {
-        if(requestedAid === element.name){
-          feedback = element.confirmationMessage;
-        }
-      });
+      
     });
   });
 }
 
 // Add additional functions below
-let feedback, getCategory, getHeading, getCountry, getLevel, requestedAid, getLength, getDisasterLength;
+let getCategory, getHeading, getCountry, getLevel, requestedAid, getLength, getDisasterLength;
 
-// general function
-function validate() {
-  let result = true;
-  if (getHeading === "Minor hostage situation"){
-    displayThankYou('thankyou', ' The ‘minor hostage situation’ does not have any aid available')
-    result = false;
-  } 
-    
-  return result;
-}
 
 // calling functions
 suggestCountry();

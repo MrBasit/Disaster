@@ -21,9 +21,19 @@ function renderDisasters(e) {
   e.preventDefault();
 }
 
-function renderBasicInfo(disaster) {}
+function renderBasicInfo(disasterType) {
+  disasterType = getHeading;
+  let result = true;
+  if (disasterType === "Minor hostage situation"){
+    displayThankYou('thankyou', ' The ‘minor hostage situation’ does not have any aid available')
+    result = false;
+  } 
+    
+  return result;
+}
 
-function renderAid(disaster) {}
+function renderAid(disaster) {
+}
 
 function displayThankYou(selector, message) {
   document.querySelector("main form").classList.add("hidden");
@@ -35,7 +45,9 @@ function displayThankYou(selector, message) {
 
 function renderAvailableAid(aid, selector) {}
 
-function displayFeedbackDisasterSaved() {}
+function displayFeedbackDisasterSaved() {
+  return 'disaster already submitted';
+}
 
 // Add additional functions below
 

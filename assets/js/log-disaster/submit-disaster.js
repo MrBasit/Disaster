@@ -2,29 +2,28 @@
 
 function submitDisaster(e) {
   // target save disasters
-document
-.querySelector("#disaster-aid").lastElementChild.lastElementChild.addEventListener("click", function (e) {
+  document.querySelector("[type = submit]").addEventListener("click", function (e) {
   saveDisaster(addDisaster());
+  e.stopPropagation();
   e.preventDefault();
 });
+
 }
 
 function saveDisaster(disaster) {
 
     const submittedDisasters = getFromLocalStorage(); 
-    if(submittedDisasters.Length < 1  || checkDuplicate(getHeading, getCountry)){
-      
-      submittedDisasters.push(disaster);
-        localStorage.setItem(
-          "submittedDisasters",
-          JSON.stringify(submittedDisasters)
-        );
-      
-
-    }
-
-    displayThankYou("thankyou", "Thank you for your submission");
-  
+       if(checkDuplicate(getHeading, getCountry)){
+         submittedDisasters.push(disaster);
+         localStorage.setItem(
+           "submittedDisasters",
+           JSON.stringify(submittedDisasters)
+           );
+           displayThankYou("thankyou", "Thank you for your submission");
+       }
+       else{
+         displayThankYou('thankyou',displayFeedbackDisasterSaved())
+        }
 }
 
 // Add additional functions below
@@ -39,7 +38,6 @@ function addDisaster() {
     aidGoal: determineAid(getLength, getDisasterLength),
     currencyGoal: determineCurrency(getLevel),
     requestedAid: requestedAid,
-    message: feedback
 
   };
 }
@@ -68,5 +66,5 @@ function checkDuplicate(name, country) {
 
 
 // call functions
-submitDisaster();
+
 
