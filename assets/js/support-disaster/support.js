@@ -71,6 +71,8 @@ function supportDisaster(e) {
         if(element.currencyGoal <= moneyGoal()){
           selectedElement.classList.add('success')
           selectedElement.removeChild(selectedElement.lastElementChild)
+          console.log(selectedElement.lastElementChild)
+          console.log(element.requestedAid)
           aid.forEach(ad => {
             if(ad.name === element.requestedAid){
               selectedElement.append(reachedGoal(element.requestedAid))

@@ -32,6 +32,7 @@ function renderBasicInfo(disasterType) {
   return result;
 }
 
+// user this function
 function renderAid(disaster) {
 }
 

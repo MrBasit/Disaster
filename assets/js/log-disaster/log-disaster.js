@@ -1,67 +1,73 @@
 "use strict";
+var script = document.createElement("script");
+script.src = "./assets/js/data/countries.js";
+document.body.appendChild(script);
+// document.writeln(
+//   "<script type='text/javascript' src='./assets/js/data/countries.js'></script>"
+// );
+
+// target elements
+const searchedCountries = document.querySelector("#disaster-location ul");
+const input = document.querySelector("#location");
 
 function suggestCountry(e) {
-
-  // search location
-const searchedCountries = document.querySelector("#disaster-location ul");
-document.querySelector("#location").addEventListener("keyup", function (e) {
-
-  // remove list
-  searchedCountries.innerHTML = "";
-  let country = e.target.value;
-  let changeCase = country.toUpperCase();
-  for (const country of countries) {
-    if (country.toUpperCase().startsWith(changeCase)) {
-      let list = document.createElement("li");
-      list.innerText = country;
-      searchedCountries.appendChild(list);
+  input.addEventListener("keyup", function (e) {
+    searchedCountries.innerHTML = "";
+    let searchedCountry = e.target.value;
+    for (const country of countries) {
+      if (country.toUpperCase().startsWith(searchedCountry.toUpperCase())) {
+        let list = document.createElement("li");
+        list.innerText = country;
+        searchedCountries.appendChild(list);
+      }
     }
-  }
-
-  selectCountry(e);
-  e.preventDefault();
-});
+    selectCountry(e);
+    e.preventDefault();
+  });
 }
 
 function selectCountry(e) {
   const countries = document.querySelectorAll("#disaster-location ul li");
-  const list = document.querySelector("#disaster-location ul");
   countries.forEach((country) => {
     country.addEventListener("click", function (e) {
-      const location = document.querySelector("#location");
-      location.value = e.target.innerText;
-      list.innerHTML = "";
+      input.value = e.target.innerText;
+      searchedCountries.innerHTML = "";
+      e.preventDefault();
     });
   });
 }
 
-function navigate(e) {
-  // target select disaster Type
-  document.querySelector(".lone").addEventListener("click", renderDisasters);
+function navigate() {
+  document.querySelector(".next").addEventListener("click", function (e) {
+    e.preventDefault();
+    if (input.value) renderDisasters(e);
+    else alert("input field required");
+  });
 
-  // target show aid
-  document.querySelector("#show-aid").addEventListener("click", showAid);
+  document.querySelector("#show-aid").addEventListener("click", function (e) {
+    e.preventDefault();
+    showAid();
+  });
 
   // goto search location
-const btnPrevious = document.querySelector(".previous");
-btnPrevious.addEventListener("click", function (e) {
-  document.querySelector("#disaster-type").classList.add("hidden");
-  document.querySelector("#disaster-location").classList.remove("hidden");
-  document.querySelector('.disasters').innerHTML = " ";
-  e.preventDefault();
-});
+  document.querySelector(".previous").addEventListener("click", function (e) {
+    document.querySelector("#disaster-type").classList.add("hidden");
+    document.querySelector("#disaster-location").classList.remove("hidden");
+    document.querySelector(".disasters").innerHTML = " ";
+    e.preventDefault();
+  });
 
-// change disaster type
-const btnChangeDisaster =
-  document.querySelector("#disaster-aid .flexcontainer .previous");
-btnChangeDisaster.addEventListener("click", function (e) {
-  document.querySelector("#disaster-aid").classList.add("hidden");
-  document.querySelector("#disaster-type").classList.remove("hidden");
-  document.querySelector("#disaster-aid .aids").innerHTML = "";
-  e.preventDefault();
-});
+  // change disaster type
+  const btnChangeDisaster = document.querySelector(
+    "#disaster-aid .flexcontainer .previous"
+  );
 
-
+  btnChangeDisaster.addEventListener("click", function (e) {
+    document.querySelector("#disaster-aid").classList.add("hidden");
+    document.querySelector("#disaster-type").classList.remove("hidden");
+    document.querySelector("#disaster-aid .aids").innerHTML = "";
+    e.preventDefault();
+  });
 }
 
 function selectDisaster(e) {
@@ -96,9 +102,9 @@ function showAid(e) {
           h3.innerText = array.name;
 
           const img = document.createElement("img");
-          let image = array.name.toLocaleLowerCase().split(' ');
-          image = image.join('-');
-          image = `./images/${image}.svg`
+          let image = array.name.toLocaleLowerCase().split(" ");
+          image = image.join("-");
+          image = `./images/${image}.svg`;
           img.setAttribute("src", image);
 
           const label = document.createElement("label");
@@ -127,14 +133,18 @@ function selectAid(e) {
       getIndex = Array.from(aids).indexOf(element);
       element.classList.add("selected");
       requestedAid = element.firstChild.innerText;
-      
     });
   });
 }
 
 // Add additional functions below
-let getCategory, getHeading, getCountry, getLevel, requestedAid, getLength, getDisasterLength;
-
+let getCategory,
+  getHeading,
+  getCountry,
+  getLevel,
+  requestedAid,
+  getLength,
+  getDisasterLength;
 
 // calling functions
 suggestCountry();
